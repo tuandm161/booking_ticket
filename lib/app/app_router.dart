@@ -11,6 +11,8 @@ import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/rooms/models/cinema_room.dart';
 import '../features/movies/presentation/screens/admin_movie_form_screen.dart';
 import '../features/movies/presentation/screens/admin_movie_list_screen.dart';
+import '../features/showtimes/presentation/screens/admin_showtime_form_screen.dart';
+import '../features/showtimes/presentation/screens/admin_showtime_list_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_list_screen.dart';
 import '../features/rooms/presentation/screens/room_detail_screen.dart';
@@ -106,6 +108,20 @@ GoRouter createAppRouter({
         path: '/admin/movies/:movieId/edit',
         builder: (context, state) =>
             AdminMovieFormScreen(movieId: state.pathParameters['movieId']),
+      ),
+      GoRoute(
+        path: '/admin/showtimes',
+        builder: (context, state) => const AdminShowtimeListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/showtimes/new',
+        builder: (context, state) => const AdminShowtimeFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/showtimes/:showtimeId/edit',
+        builder: (context, state) => AdminShowtimeFormScreen(
+          showtimeId: state.pathParameters['showtimeId'],
+        ),
       ),
       GoRoute(
         path: '/admin/rooms/new',
