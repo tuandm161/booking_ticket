@@ -8,6 +8,10 @@ import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/profile_missing_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
+import '../features/rooms/models/cinema_room.dart';
+import '../features/rooms/presentation/screens/admin_room_form_screen.dart';
+import '../features/rooms/presentation/screens/admin_room_list_screen.dart';
+import '../features/rooms/presentation/screens/room_detail_screen.dart';
 import '../features/user_home/presentation/screens/user_home_screen.dart';
 import '../shared/models/app_user.dart';
 
@@ -83,6 +87,30 @@ GoRouter createAppRouter({
       GoRoute(
         path: '/admin/dashboard',
         builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/rooms',
+        builder: (context, state) => const AdminRoomListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/rooms/new',
+        builder: (context, state) => const AdminRoomFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/rooms/:roomId/edit',
+        builder: (context, state) =>
+            AdminRoomFormScreen(roomId: state.pathParameters['roomId']),
+      ),
+      GoRoute(
+        path: '/admin/rooms/:roomId',
+        builder: (context, state) {
+          final room = state.extra;
+          return room is CinemaRoom
+              ? RoomDetailScreen(room: room)
+              : const Scaffold(
+                  body: Center(child: Text('Không tìm thấy phòng.')),
+                );
+        },
       ),
     ],
   );

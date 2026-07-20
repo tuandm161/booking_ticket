@@ -6,11 +6,20 @@ class AdminDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Admin Dashboard')),
-    body: Center(
-      child: FilledButton(
-        onPressed: () => context.go('/login'),
-        child: const Text('Đăng xuất'),
-      ),
+    body: ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        FilledButton.icon(
+          onPressed: () => context.push('/admin/rooms'),
+          icon: const Icon(Icons.meeting_room_outlined),
+          label: const Text('Quản lý phòng chiếu'),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton(
+          onPressed: () => context.go('/login'),
+          child: const Text('Đăng xuất'),
+        ),
+      ],
     ),
   );
 }
