@@ -27,6 +27,24 @@ class AdminDashboardScreen extends StatelessWidget {
           label: const Text('Quản lý suất chiếu'),
         ),
         const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: () => context.push('/admin/products'),
+          icon: const Icon(Icons.local_drink_outlined),
+          label: const Text('Quản lý sản phẩm'),
+        ),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: () => context.push('/admin/combos'),
+          icon: const Icon(Icons.fastfood_outlined),
+          label: const Text('Quản lý combo'),
+        ),
+        const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: () => context.push('/admin/vouchers'),
+          icon: const Icon(Icons.discount_outlined),
+          label: const Text('Quản lý voucher'),
+        ),
+        const SizedBox(height: 12),
         OutlinedButton(
           onPressed: () => context.go('/login'),
           child: const Text('Đăng xuất'),

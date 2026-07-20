@@ -13,6 +13,12 @@ import '../features/movies/presentation/screens/admin_movie_form_screen.dart';
 import '../features/movies/presentation/screens/admin_movie_list_screen.dart';
 import '../features/showtimes/presentation/screens/admin_showtime_form_screen.dart';
 import '../features/showtimes/presentation/screens/admin_showtime_list_screen.dart';
+import '../features/concessions/presentation/screens/admin_product_list_screen.dart';
+import '../features/concessions/presentation/screens/admin_product_form_screen.dart';
+import '../features/concessions/presentation/screens/admin_combo_list_screen.dart';
+import '../features/concessions/presentation/screens/admin_combo_form_screen.dart';
+import '../features/vouchers/presentation/screens/admin_voucher_list_screen.dart';
+import '../features/vouchers/presentation/screens/admin_voucher_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_list_screen.dart';
 import '../features/rooms/presentation/screens/room_detail_screen.dart';
@@ -121,6 +127,47 @@ GoRouter createAppRouter({
         path: '/admin/showtimes/:showtimeId/edit',
         builder: (context, state) => AdminShowtimeFormScreen(
           showtimeId: state.pathParameters['showtimeId'],
+        ),
+      ),
+      GoRoute(
+        path: '/admin/products',
+        builder: (context, state) => const AdminProductListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/products/new',
+        builder: (context, state) => const AdminProductFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/products/:productId/edit',
+        builder: (context, state) => AdminProductFormScreen(
+          productId: state.pathParameters['productId'],
+        ),
+      ),
+      GoRoute(
+        path: '/admin/combos',
+        builder: (context, state) => const AdminComboListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/combos/new',
+        builder: (context, state) => const AdminComboFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/combos/:comboId/edit',
+        builder: (context, state) =>
+            AdminComboFormScreen(comboId: state.pathParameters['comboId']),
+      ),
+      GoRoute(
+        path: '/admin/vouchers',
+        builder: (context, state) => const AdminVoucherListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/vouchers/new',
+        builder: (context, state) => const AdminVoucherFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/vouchers/:voucherId/edit',
+        builder: (context, state) => AdminVoucherFormScreen(
+          voucherId: state.pathParameters['voucherId'],
         ),
       ),
       GoRoute(
