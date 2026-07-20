@@ -27,6 +27,7 @@ import '../features/user_home/presentation/screens/user_search_screen.dart';
 import '../features/user_home/presentation/screens/user_catalog_list_screen.dart';
 import '../features/movies/presentation/screens/user_movie_detail_screen.dart';
 import '../features/showtimes/presentation/screens/user_showtimes_screen.dart';
+import '../features/booking/presentation/screens/seat_selection_screen.dart';
 import '../shared/models/app_user.dart';
 
 GoRouter createAppRouter({
@@ -122,6 +123,12 @@ GoRouter createAppRouter({
         path: '/user/showtimes/:movieId',
         builder: (context, state) =>
             UserShowtimesScreen(movieId: state.pathParameters['movieId']!),
+      ),
+      GoRoute(
+        path: '/user/seats/:showtimeId',
+        builder: (context, state) => SeatSelectionScreen(
+          showtimeId: state.pathParameters['showtimeId']!,
+        ),
       ),
       GoRoute(
         path: '/user/tickets',
