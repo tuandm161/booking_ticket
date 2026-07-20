@@ -28,6 +28,11 @@ import '../features/user_home/presentation/screens/user_catalog_list_screen.dart
 import '../features/movies/presentation/screens/user_movie_detail_screen.dart';
 import '../features/showtimes/presentation/screens/user_showtimes_screen.dart';
 import '../features/booking/presentation/screens/seat_selection_screen.dart';
+import '../features/concessions/presentation/screens/user_concession_screen.dart';
+import '../features/booking/presentation/screens/checkout_screen.dart';
+import '../features/booking/presentation/screens/payment_method_screen.dart';
+import '../features/booking/presentation/screens/card_payment_form_screen.dart';
+import '../features/booking/presentation/screens/payment_processing_screen.dart';
 import '../shared/models/app_user.dart';
 
 GoRouter createAppRouter({
@@ -128,6 +133,31 @@ GoRouter createAppRouter({
         path: '/user/seats/:showtimeId',
         builder: (context, state) => SeatSelectionScreen(
           showtimeId: state.pathParameters['showtimeId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/user/concessions',
+        builder: (context, state) => const UserConcessionScreen(),
+      ),
+      GoRoute(
+        path: '/user/checkout',
+        builder: (context, state) => const CheckoutScreen(),
+      ),
+      GoRoute(
+        path: '/user/payment-method',
+        builder: (context, state) => const PaymentMethodScreen(),
+      ),
+      GoRoute(
+        path: '/user/card-payment',
+        builder: (context, state) => CardPaymentFormScreen(
+          simulateFailure: state.uri.queryParameters['fail'] == 'true',
+        ),
+      ),
+      GoRoute(
+        path: '/user/payment-processing/:method',
+        builder: (context, state) => PaymentProcessingScreen(
+          method: state.pathParameters['method']!,
+          simulateFailure: state.uri.queryParameters['fail'] == 'true',
         ),
       ),
       GoRoute(

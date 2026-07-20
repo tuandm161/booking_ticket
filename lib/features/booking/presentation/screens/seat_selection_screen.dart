@@ -1,6 +1,7 @@
 // ignore_for_file: curly_braces_in_flow_control_structures, unnecessary_underscores, deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/services/firebase_providers.dart';
 import '../../../movies/data/movie_repository.dart';
 import '../../../rooms/data/room_repository.dart';
@@ -225,12 +226,7 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
                             total: seatTotal,
                           ),
                         );
-                    if (context.mounted)
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Đã giữ ghế trong 10 phút.'),
-                        ),
-                      );
+                    if (context.mounted) context.push('/user/concessions');
                   },
                 ),
               ],

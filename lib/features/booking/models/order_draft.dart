@@ -58,4 +58,19 @@ class OrderDraft {
     discount: discount ?? this.discount,
     total: total ?? this.total,
   );
+  OrderDraft clearVoucher() => OrderDraft(
+    movie: movie,
+    showtime: showtime,
+    room: room,
+    selectedSeats: selectedSeats,
+    reservationId: reservationId,
+    holdExpiresAt: holdExpiresAt,
+    productQuantities: productQuantities,
+    comboQuantities: comboQuantities,
+    appliedVoucher: null,
+    seatSubtotal: seatSubtotal,
+    concessionSubtotal: concessionSubtotal,
+    discount: 0,
+    total: total,
+  );
 }

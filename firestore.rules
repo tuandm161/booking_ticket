@@ -14,7 +14,7 @@ service cloud.firestore {
       allow update: if isAdmin() || (isOwner(uid) && onlyChanged(['displayName', 'updatedAt']) && request.resource.data.role == resource.data.role && request.resource.data.email == resource.data.email);
       allow delete: if isAdmin();
     }
-    match /movies/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    match /movies/{id} { allow read: if isSignedIn(); allow create, delete: if isAdmin(); allow update: if isAdmin() || (isSignedIn() && onlyChanged(['bookingCount', 'updatedAt']) && request.resource.data.bookingCount >= resource.data.bookingCount); }
     match /rooms/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
     match /products/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
     match /combos/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
@@ -22,7 +22,7 @@ service cloud.firestore {
     match /vouchers/{id} {
       allow read: if isSignedIn();
       allow create, delete: if isAdmin();
-      allow update: if isAdmin() || (isSignedIn() && onlyChanged(['usedCount']) && request.resource.data.usedCount == resource.data.usedCount + 1);
+      allow update: if isAdmin() || (isSignedIn() && onlyChanged(['usedCount', 'updatedAt']) && request.resource.data.usedCount == resource.data.usedCount + 1);
     }
 
     match /showtimes/{id} {
