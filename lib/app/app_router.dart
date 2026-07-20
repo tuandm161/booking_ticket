@@ -37,6 +37,9 @@ import '../features/booking/presentation/screens/payment_success_screen.dart';
 import '../features/booking/presentation/screens/my_tickets_screen.dart';
 import '../features/booking/presentation/screens/ticket_detail_screen.dart';
 import '../features/notifications/presentation/screens/notification_list_screen.dart';
+import '../features/booking/presentation/screens/admin_booking_list_screen.dart';
+import '../features/booking/presentation/screens/admin_booking_detail_screen.dart';
+import '../features/admin_dashboard/presentation/screens/admin_management_menu_screen.dart';
 import '../shared/models/app_user.dart';
 
 GoRouter createAppRouter({
@@ -189,6 +192,20 @@ GoRouter createAppRouter({
       GoRoute(
         path: '/admin/dashboard',
         builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/bookings',
+        builder: (context, state) => const AdminBookingListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/bookings/:bookingId',
+        builder: (context, state) => AdminBookingDetailScreen(
+          bookingId: state.pathParameters['bookingId']!,
+        ),
+      ),
+      GoRoute(
+        path: '/admin/management',
+        builder: (context, state) => const AdminManagementMenuScreen(),
       ),
       GoRoute(
         path: '/admin/rooms',
