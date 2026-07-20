@@ -1,4 +1,5 @@
 // ignore_for_file: curly_braces_in_flow_control_structures
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,7 @@ class PaymentProcessingScreen extends ConsumerStatefulWidget {
 class _PaymentProcessingScreenState
     extends ConsumerState<PaymentProcessingScreen> {
   var started = false;
+  var routed = false;
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(checkoutControllerProvider);
@@ -67,7 +69,16 @@ class _PaymentProcessingScreenState
         data: (result) {
           if (result == null)
             return const Center(child: Text('Chuẩn bị thanh toán...'));
-          return Center(
+          if (!routed) {
+            routed = true;
+            Future.microtask(
+              () => context.go('/user/payment-success/${result.bookingId}'),
+            );
+          }
+          return const Center(
+            child: Text('Thanh toán thành công, đang mở vé...'),
+          );
+          /*return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -83,7 +94,7 @@ class _PaymentProcessingScreenState
                 ),
               ],
             ),
-          );
+          );*/
         },
       ),
     );

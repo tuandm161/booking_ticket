@@ -33,6 +33,10 @@ import '../features/booking/presentation/screens/checkout_screen.dart';
 import '../features/booking/presentation/screens/payment_method_screen.dart';
 import '../features/booking/presentation/screens/card_payment_form_screen.dart';
 import '../features/booking/presentation/screens/payment_processing_screen.dart';
+import '../features/booking/presentation/screens/payment_success_screen.dart';
+import '../features/booking/presentation/screens/my_tickets_screen.dart';
+import '../features/booking/presentation/screens/ticket_detail_screen.dart';
+import '../features/notifications/presentation/screens/notification_list_screen.dart';
 import '../shared/models/app_user.dart';
 
 GoRouter createAppRouter({
@@ -161,13 +165,22 @@ GoRouter createAppRouter({
         ),
       ),
       GoRoute(
-        path: '/user/tickets',
+        path: '/user/payment-success/:bookingId',
         builder: (context, state) =>
-            const _UserPlaceholder(title: 'Vé của tôi'),
+            PaymentSuccessScreen(bookingId: state.pathParameters['bookingId']!),
+      ),
+      GoRoute(
+        path: '/user/tickets',
+        builder: (context, state) => const MyTicketsScreen(),
+      ),
+      GoRoute(
+        path: '/user/tickets/:bookingId',
+        builder: (context, state) =>
+            TicketDetailScreen(bookingId: state.pathParameters['bookingId']!),
       ),
       GoRoute(
         path: '/user/notifications',
-        builder: (context, state) => const _UserPlaceholder(title: 'Thông báo'),
+        builder: (context, state) => const NotificationListScreen(),
       ),
       GoRoute(
         path: '/user/profile',
@@ -270,15 +283,5 @@ GoRouter createAppRouter({
         },
       ),
     ],
-  );
-}
-
-class _UserPlaceholder extends StatelessWidget {
-  const _UserPlaceholder({required this.title});
-  final String title;
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(title)),
-    body: const Center(child: Text('Tính năng sẽ có trong phase tiếp theo.')),
   );
 }

@@ -4,6 +4,7 @@
     {"collectionGroup": "showtimes", "queryScope": "COLLECTION", "fields": [{"fieldPath": "movieId", "order": "ASCENDING"}, {"fieldPath": "isActive", "order": "ASCENDING"}, {"fieldPath": "startTime", "order": "ASCENDING"}]},
     {"collectionGroup": "bookings", "queryScope": "COLLECTION", "fields": [{"fieldPath": "userId", "order": "ASCENDING"}, {"fieldPath": "createdAt", "order": "DESCENDING"}]},
     {"collectionGroup": "notifications", "queryScope": "COLLECTION", "fields": [{"fieldPath": "userId", "order": "ASCENDING"}, {"fieldPath": "createdAt", "order": "DESCENDING"}]},
+    {"collectionGroup": "notifications", "queryScope": "COLLECTION", "fields": [{"fieldPath": "userId", "order": "ASCENDING"}, {"fieldPath": "isRead", "order": "ASCENDING"}]},
     {"collectionGroup": "showtimes", "queryScope": "COLLECTION", "fields": [{"fieldPath": "roomId", "order": "ASCENDING"}, {"fieldPath": "isActive", "order": "ASCENDING"}, {"fieldPath": "startTime", "order": "ASCENDING"}]},
     {"collectionGroup": "showtimes", "queryScope": "COLLECTION", "fields": [{"fieldPath": "movieId", "order": "ASCENDING"}, {"fieldPath": "isActive", "order": "ASCENDING"}, {"fieldPath": "startTime", "order": "ASCENDING"}]}
   ],
