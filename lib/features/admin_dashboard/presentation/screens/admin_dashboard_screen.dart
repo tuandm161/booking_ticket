@@ -15,6 +15,12 @@ class AdminDashboardScreen extends StatelessWidget {
           label: const Text('Quản lý phòng chiếu'),
         ),
         const SizedBox(height: 12),
+        FilledButton.icon(
+          onPressed: () => context.push('/admin/movies'),
+          icon: const Icon(Icons.movie_outlined),
+          label: const Text('Quản lý phim'),
+        ),
+        const SizedBox(height: 12),
         OutlinedButton(
           onPressed: () => context.go('/login'),
           child: const Text('Đăng xuất'),

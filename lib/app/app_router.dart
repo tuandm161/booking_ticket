@@ -9,6 +9,8 @@ import '../features/auth/presentation/screens/profile_missing_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/rooms/models/cinema_room.dart';
+import '../features/movies/presentation/screens/admin_movie_form_screen.dart';
+import '../features/movies/presentation/screens/admin_movie_list_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_list_screen.dart';
 import '../features/rooms/presentation/screens/room_detail_screen.dart';
@@ -91,6 +93,19 @@ GoRouter createAppRouter({
       GoRoute(
         path: '/admin/rooms',
         builder: (context, state) => const AdminRoomListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/movies',
+        builder: (context, state) => const AdminMovieListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/movies/new',
+        builder: (context, state) => const AdminMovieFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/movies/:movieId/edit',
+        builder: (context, state) =>
+            AdminMovieFormScreen(movieId: state.pathParameters['movieId']),
       ),
       GoRoute(
         path: '/admin/rooms/new',
