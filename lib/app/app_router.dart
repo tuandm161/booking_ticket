@@ -23,6 +23,10 @@ import '../features/rooms/presentation/screens/admin_room_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_list_screen.dart';
 import '../features/rooms/presentation/screens/room_detail_screen.dart';
 import '../features/user_home/presentation/screens/user_home_screen.dart';
+import '../features/user_home/presentation/screens/user_search_screen.dart';
+import '../features/user_home/presentation/screens/user_catalog_list_screen.dart';
+import '../features/movies/presentation/screens/user_movie_detail_screen.dart';
+import '../features/showtimes/presentation/screens/user_showtimes_screen.dart';
 import '../shared/models/app_user.dart';
 
 GoRouter createAppRouter({
@@ -93,6 +97,44 @@ GoRouter createAppRouter({
       GoRoute(
         path: '/user/home',
         builder: (context, state) => const UserHomeScreen(),
+      ),
+      GoRoute(
+        path: '/user/search',
+        builder: (context, state) => const UserSearchScreen(),
+      ),
+      GoRoute(
+        path: '/user/catalog/:section',
+        builder: (context, state) => UserCatalogListScreen(
+          title: switch (state.pathParameters['section']) {
+            'nowShowing' => 'Đang chiếu',
+            'comingSoon' => 'Sắp chiếu',
+            _ => 'Phổ biến',
+          },
+          section: state.pathParameters['section'] ?? 'popular',
+        ),
+      ),
+      GoRoute(
+        path: '/user/movie/:movieId',
+        builder: (context, state) =>
+            UserMovieDetailScreen(movieId: state.pathParameters['movieId']!),
+      ),
+      GoRoute(
+        path: '/user/showtimes/:movieId',
+        builder: (context, state) =>
+            UserShowtimesScreen(movieId: state.pathParameters['movieId']!),
+      ),
+      GoRoute(
+        path: '/user/tickets',
+        builder: (context, state) =>
+            const _UserPlaceholder(title: 'Vé của tôi'),
+      ),
+      GoRoute(
+        path: '/user/notifications',
+        builder: (context, state) => const _UserPlaceholder(title: 'Thông báo'),
+      ),
+      GoRoute(
+        path: '/user/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
         path: '/admin/dashboard',
@@ -191,5 +233,15 @@ GoRouter createAppRouter({
         },
       ),
     ],
+  );
+}
+
+class _UserPlaceholder extends StatelessWidget {
+  const _UserPlaceholder({required this.title});
+  final String title;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: Text(title)),
+    body: const Center(child: Text('Tính năng sẽ có trong phase tiếp theo.')),
   );
 }
