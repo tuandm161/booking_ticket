@@ -97,6 +97,12 @@ class _AdminComboFormScreenState extends ConsumerState<AdminComboFormScreen> {
     final products = ref.watch(productsProvider);
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/combos'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
         title: Text(widget.comboId == null ? 'Thêm combo' : 'Sửa combo'),
       ),
       body: products.when(

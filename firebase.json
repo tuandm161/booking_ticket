@@ -1,0 +1,26 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "movie-booking-demo",
+          "appId": "1:245185291227:android:a3df0256e571209c267dfe",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "movie-booking-demo",
+          "configurations": {
+            "android": "1:245185291227:android:a3df0256e571209c267dfe",
+            "web": "1:245185291227:web:9cf45f026e6ac3ce267dfe"
+          }
+        }
+      }
+    }
+  }
+}

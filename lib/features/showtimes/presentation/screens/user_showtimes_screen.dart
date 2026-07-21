@@ -2,7 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/firebase_providers.dart';
 import '../../../../shared/widgets/user_bottom_navigation.dart';
+import '../../../booking/presentation/screens/seat_selection_screen.dart';
+import '../../../movies/data/movie_repository.dart';
+import '../../../rooms/data/room_repository.dart';
 import '../../providers/user_showtime_providers.dart';
 import '../widgets/showtime_day_selector.dart';
 import '../widgets/showtime_chip.dart';
@@ -35,7 +39,24 @@ class UserShowtimesScreen extends ConsumerWidget {
           return _ShowtimeDays(
             items: items,
             days: days,
-            onSelect: (showtime) => context.push('/user/seats/${showtime.id}'),
+            onSelect: (showtime) async {
+              final firestore = ref.read(firestoreProvider);
+              final results = await Future.wait([
+                RoomRepository(firestore).getRoom(showtime.roomId),
+                MovieRepository(firestore).getMovie(showtime.movieId),
+              ]);
+              final room = results[0];
+              final movie = results[1];
+              if (room == null || movie == null || !context.mounted) return;
+              context.push(
+                '/user/seats/${showtime.id}',
+                extra: SeatSelectionArgs(
+                  showtime: showtime,
+                  room: room as dynamic,
+                  movie: movie as dynamic,
+                ),
+              );
+            },
           );
         },
       ),

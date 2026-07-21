@@ -102,6 +102,12 @@ class _AdminVoucherFormScreenState
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/vouchers'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
         title: Text(widget.voucherId == null ? 'Thêm voucher' : 'Sửa voucher'),
       ),
       body: Form(

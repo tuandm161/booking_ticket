@@ -86,6 +86,12 @@ class _AdminProductFormScreenState
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/products'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
         title: Text(
           widget.productId == null ? 'Thêm sản phẩm' : 'Sửa sản phẩm',
         ),

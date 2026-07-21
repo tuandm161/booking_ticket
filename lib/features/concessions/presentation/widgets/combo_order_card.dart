@@ -13,20 +13,50 @@ class ComboOrderCard extends StatelessWidget {
   final ValueChanged<int> onChanged;
   @override
   Widget build(BuildContext context) => Card(
-    child: ListTile(
-      title: Text(combo.name),
-      subtitle: Text('${combo.price} đ\n${combo.description}'),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+      child: Row(
         children: [
-          IconButton(
-            onPressed: quantity == 0 ? null : () => onChanged(quantity - 1),
-            icon: const Icon(Icons.remove_circle_outline),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  combo.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text('${combo.price} đ'),
+                if (combo.description.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    combo.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
           ),
-          Text('$quantity'),
-          IconButton(
-            onPressed: quantity >= 10 ? null : () => onChanged(quantity + 1),
-            icon: const Icon(Icons.add_circle_outline),
+          const SizedBox(width: 8),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                onPressed: quantity == 0 ? null : () => onChanged(quantity - 1),
+                icon: const Icon(Icons.remove_circle_outline),
+              ),
+              Text('$quantity'),
+              IconButton(
+                onPressed: quantity >= 10
+                    ? null
+                    : () => onChanged(quantity + 1),
+                icon: const Icon(Icons.add_circle_outline),
+              ),
+            ],
           ),
         ],
       ),

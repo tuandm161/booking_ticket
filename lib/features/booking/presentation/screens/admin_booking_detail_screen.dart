@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_underscores, curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/widgets/admin_bottom_navigation.dart';
 import '../../providers/booking_providers.dart';
@@ -13,7 +14,15 @@ class AdminBookingDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(bookingDetailProvider(bookingId));
     return Scaffold(
-      appBar: AppBar(title: const Text('Chi tiết booking')),
+      appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại booking',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/bookings'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
+        title: const Text('Chi tiết booking'),
+      ),
       bottomNavigationBar: const AdminBottomNavigation(index: 3),
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),

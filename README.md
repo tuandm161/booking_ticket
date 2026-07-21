@@ -9,6 +9,7 @@
 - User tìm phim, chọn ghế Standard/VIP/Couple, checkout atomic.
 - Vé bất biến có QR, notifications realtime, admin booking viewer/dashboard.
 - Theme sáng/tối lưu bằng SharedPreferences.
+- FCM tùy chọn: token lưu trong `users/{uid}.fcmTokens`, foreground local banner và deep-link booking khi tap.
 
 ## Công nghệ
 
@@ -32,6 +33,18 @@ flutter build apk --release --dart-define=TMDB_READ_TOKEN=<token>
 ```
 
 Không có token thì CRUD phim thủ công vẫn hoạt động.
+
+Để giữ token ngoài source code trên PowerShell, lưu một dòng token mới trong `secrets/tmdb_token.txt` (thư mục này đã được `.gitignore` bỏ qua), rồi chạy:
+
+```powershell
+$tmdbToken = (Get-Content secrets/tmdb_token.txt -Raw).Trim()
+flutter run "--dart-define=TMDB_READ_TOKEN=$tmdbToken"
+Remove-Variable tmdbToken
+```
+
+## FCM tùy chọn
+
+Android notification permission và FCM token được xử lý sau khi Firebase khởi động. Token refresh được lưu bằng `arrayUnion`; foreground message hiển thị local notification, còn background/initial message đọc `bookingId` để mở chi tiết vé. Booking vẫn dùng notification Firestore làm source of truth. Gửi thử push từ Firebase Console; client không chứa server key và không tự gửi push.
 
 ## Kiểm tra và build
 

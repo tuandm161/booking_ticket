@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/seed_provider.dart';
 import '../../../../core/widgets/app_async_value_widget.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../shared/widgets/admin_bottom_navigation.dart';
 import '../../providers/room_providers.dart';
 import '../widgets/room_card.dart';
 
@@ -24,7 +25,7 @@ class _AdminRoomListScreenState extends ConsumerState<AdminRoomListScreen> {
         title: const Text('Quản lý phòng'),
         actions: [
           IconButton(
-            tooltip: 'Seed 6 phòng',
+            tooltip: 'Tạo 4 phòng mẫu',
             onPressed: _seed,
             icon: const Icon(Icons.playlist_add),
           ),
@@ -75,6 +76,7 @@ class _AdminRoomListScreenState extends ConsumerState<AdminRoomListScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const AdminBottomNavigation(index: 4),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/admin/rooms/new'),
         icon: const Icon(Icons.add),
@@ -92,7 +94,7 @@ class _AdminRoomListScreenState extends ConsumerState<AdminRoomListScreen> {
           content: Text(
             result.skipped
                 ? 'Đã có dữ liệu phòng, không seed lại.'
-                : 'Đã tạo ${result.createdCount} phòng.',
+                : 'Đã tạo ${result.createdCount} phòng mẫu.',
           ),
         ),
       );

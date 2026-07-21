@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/cinema_room.dart';
 import '../widgets/seat_layout_preview.dart';
 
@@ -7,7 +8,15 @@ class RoomDetailScreen extends StatelessWidget {
   final CinemaRoom room;
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(room.name)),
+    appBar: AppBar(
+      leading: IconButton(
+        tooltip: 'Quay lại danh sách phòng',
+        onPressed: () =>
+            context.canPop() ? context.pop() : context.go('/admin/rooms'),
+        icon: const Icon(Icons.arrow_back_rounded),
+      ),
+      title: Text(room.name),
+    ),
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [

@@ -113,6 +113,12 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
     } catch (_) {}
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/rooms'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
         title: Text(widget.roomId == null ? 'Thêm phòng' : 'Sửa phòng'),
       ),
       body: Form(

@@ -20,6 +20,8 @@ class AdminShowtimeFormScreen extends ConsumerStatefulWidget {
 class _AdminShowtimeFormScreenState
     extends ConsumerState<AdminShowtimeFormScreen> {
   String? _movieId, _roomId;
+  String _movieQuery = '';
+  String _roomQuery = '';
   DateTime _start = DateTime.now().add(const Duration(hours: 1));
   final _price = TextEditingController(text: '80000');
   bool _active = true, _loading = true, _saving = false;
@@ -140,7 +142,16 @@ class _AdminShowtimeFormScreenState
     final rooms = ref.watch(roomsProvider);
     if (movies.hasError || rooms.hasError)
       return Scaffold(
-        appBar: AppBar(title: const Text('Suất chiếu')),
+        appBar: AppBar(
+          leading: IconButton(
+            tooltip: 'Quay lại',
+            onPressed: () => context.canPop()
+                ? context.pop()
+                : context.go('/admin/showtimes'),
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+          title: const Text('Suất chiếu'),
+        ),
         body: Center(child: Text('${movies.error ?? rooms.error}')),
       );
     if (movies.isLoading ||
@@ -150,6 +161,12 @@ class _AdminShowtimeFormScreenState
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại danh sách suất chiếu',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/showtimes'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
         title: Text(
           widget.showtimeId == null ? 'Thêm suất chiếu' : 'Sửa suất chiếu',
         ),
@@ -165,6 +182,12 @@ class _AdminShowtimeFormScreenState
   ) {
     final activeMovies = movieItems.where((movie) => movie.isActive).toList();
     final activeRooms = roomItems.where((room) => room.isActive).toList();
+    final filteredMovies = activeMovies
+        .where((movie) => movie.title.toLowerCase().contains(_movieQuery))
+        .toList();
+    final filteredRooms = activeRooms
+        .where((room) => room.name.toLowerCase().contains(_roomQuery))
+        .toList();
     final duration =
         activeMovies
             .where((movie) => movie.id == _movieId)
@@ -178,12 +201,30 @@ class _AdminShowtimeFormScreenState
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        TextField(
+          decoration: InputDecoration(
+            labelText: 'Tìm phim',
+            hintText: 'Gõ tên phim để lọc danh sách',
+            prefixIcon: const Icon(Icons.search_rounded),
+            suffixIcon: _movieQuery.isEmpty
+                ? null
+                : IconButton(
+                    onPressed: () => setState(() => _movieQuery = ''),
+                    icon: const Icon(Icons.clear_rounded),
+                  ),
+          ),
+          onChanged: (value) =>
+              setState(() => _movieQuery = value.trim().toLowerCase()),
+        ),
+        const SizedBox(height: 10),
         DropdownButtonFormField<String>(
-          initialValue: activeMovies.any((movie) => movie.id == _movieId)
+          initialValue: filteredMovies.any((movie) => movie.id == _movieId)
               ? _movieId
               : null,
-          decoration: const InputDecoration(labelText: 'Phim'),
-          items: activeMovies
+          decoration: InputDecoration(
+            labelText: 'Phim (${filteredMovies.length})',
+          ),
+          items: filteredMovies
               .map(
                 (movie) => DropdownMenuItem(
                   value: movie.id,
@@ -198,12 +239,30 @@ class _AdminShowtimeFormScreenState
           onChanged: (value) => setState(() => _movieId = value),
         ),
         const SizedBox(height: 12),
+        TextField(
+          decoration: InputDecoration(
+            labelText: 'Tìm phòng',
+            hintText: 'Phòng 1, Phòng 2...',
+            prefixIcon: const Icon(Icons.meeting_room_outlined),
+            suffixIcon: _roomQuery.isEmpty
+                ? null
+                : IconButton(
+                    onPressed: () => setState(() => _roomQuery = ''),
+                    icon: const Icon(Icons.clear_rounded),
+                  ),
+          ),
+          onChanged: (value) =>
+              setState(() => _roomQuery = value.trim().toLowerCase()),
+        ),
+        const SizedBox(height: 10),
         DropdownButtonFormField<String>(
-          initialValue: activeRooms.any((room) => room.id == _roomId)
+          initialValue: filteredRooms.any((room) => room.id == _roomId)
               ? _roomId
               : null,
-          decoration: const InputDecoration(labelText: 'Phòng'),
-          items: activeRooms
+          decoration: InputDecoration(
+            labelText: 'Phòng (${filteredRooms.length})',
+          ),
+          items: filteredRooms
               .map(
                 (room) =>
                     DropdownMenuItem(value: room.id, child: Text(room.name)),

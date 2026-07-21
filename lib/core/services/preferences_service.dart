@@ -16,7 +16,8 @@ class PreferencesService {
     return switch (_preferences.getString(AppConstants.themeModeKey)) {
       'dark' => ThemeMode.dark,
       'light' => ThemeMode.light,
-      _ => ThemeMode.system,
+      // The premium lobby palette is light by default; users can switch to dark mode.
+      _ => ThemeMode.light,
     };
   }
 

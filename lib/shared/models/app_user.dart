@@ -17,6 +17,7 @@ class AppUser {
     required this.role,
     this.createdAt,
     this.updatedAt,
+    this.fcmTokens = const [],
   });
 
   final String id;
@@ -25,6 +26,7 @@ class AppUser {
   final UserRole role;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<String> fcmTokens;
 
   factory AppUser.fromMap(String id, Map<String, Object?> map) => AppUser(
     id: id,
@@ -33,6 +35,9 @@ class AppUser {
     role: UserRoleX.fromValue(map['role']),
     createdAt: _dateFrom(map['createdAt']),
     updatedAt: _dateFrom(map['updatedAt']),
+    fcmTokens:
+        (map['fcmTokens'] as Iterable?)?.whereType<String>().toList() ??
+        const [],
   );
 
   Map<String, Object?> toMap() => {
@@ -41,6 +46,7 @@ class AppUser {
     'role': role.value,
     'createdAt': createdAt == null ? null : Timestamp.fromDate(createdAt!),
     'updatedAt': updatedAt == null ? null : Timestamp.fromDate(updatedAt!),
+    'fcmTokens': fcmTokens,
   };
 
   static DateTime? _dateFrom(Object? value) => value is Timestamp

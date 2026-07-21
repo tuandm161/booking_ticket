@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../auth/providers/auth_controller.dart';
 import '../../../../shared/widgets/admin_bottom_navigation.dart';
 
-class AdminManagementMenuScreen extends StatelessWidget {
+class AdminManagementMenuScreen extends ConsumerWidget {
   const AdminManagementMenuScreen({super.key});
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
     appBar: AppBar(title: const Text('Quản lý')),
     bottomNavigationBar: const AdminBottomNavigation(index: 4),
     body: ListView(
@@ -23,8 +25,20 @@ class AdminManagementMenuScreen extends StatelessWidget {
         ),
         _Link(label: 'Combo', icon: Icons.fastfood, path: '/admin/combos'),
         _Link(label: 'Voucher', icon: Icons.discount, path: '/admin/vouchers'),
+        const SizedBox(height: 12),
         OutlinedButton(
-          onPressed: () => context.go('/login'),
+          onPressed: () async {
+            await ref.read(authControllerProvider.notifier).signOut();
+            if (!context.mounted) return;
+            final state = ref.read(authControllerProvider);
+            if (state.hasError) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.error.toString())));
+            } else {
+              context.go('/login');
+            }
+          },
           child: const Text('Đăng xuất'),
         ),
       ],

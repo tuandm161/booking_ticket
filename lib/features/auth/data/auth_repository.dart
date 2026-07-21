@@ -93,6 +93,28 @@ class AuthRepository {
     }
   }
 
+  Future<void> updateProfile({required String displayName}) async {
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) {
+      throw const AppException(
+        code: 'not_authenticated',
+        message: 'Bạn chưa đăng nhập.',
+      );
+    }
+    final name = displayName.trim();
+    if (name.isEmpty) {
+      throw const AppException(
+        code: 'invalid_display_name',
+        message: 'Tên hiển thị không được để trống.',
+      );
+    }
+    await firebaseUser.updateDisplayName(name);
+    await _firestore.collection(FirestorePaths.users).doc(firebaseUser.uid).set(
+      {'displayName': name, 'updatedAt': Timestamp.now()},
+      SetOptions(merge: true),
+    );
+  }
+
   Future<void> signOut() => _auth.signOut();
 
   AppException _mapAuthError(FirebaseAuthException error) {

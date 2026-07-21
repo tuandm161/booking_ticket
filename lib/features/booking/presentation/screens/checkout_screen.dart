@@ -94,6 +94,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
               const SizedBox(width: 8),
               FilledButton(
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 50)),
                 onPressed: () async {
                   final voucher = await ref
                       .read(voucherApplyControllerProvider.notifier)

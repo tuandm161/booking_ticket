@@ -11,7 +11,7 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isOwner(uid) || isAdmin();
       allow create: if isOwner(uid) && request.resource.data.role == 'user';
-      allow update: if isAdmin() || (isOwner(uid) && onlyChanged(['displayName', 'updatedAt']) && request.resource.data.role == resource.data.role && request.resource.data.email == resource.data.email);
+      allow update: if isAdmin() || (isOwner(uid) && onlyChanged(['displayName', 'fcmTokens', 'updatedAt']) && request.resource.data.role == resource.data.role && request.resource.data.email == resource.data.email && request.resource.data.fcmTokens is list && (!resource.data.keys().hasAny(['fcmTokens']) || request.resource.data.fcmTokens.hasAll(resource.data.fcmTokens)));
       allow delete: if isAdmin();
     }
     match /movies/{id} { allow read: if isSignedIn(); allow create, delete: if isAdmin(); allow update: if isAdmin() || (isSignedIn() && onlyChanged(['bookingCount', 'updatedAt']) && request.resource.data.bookingCount >= resource.data.bookingCount); }

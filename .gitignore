@@ -43,3 +43,21 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/android/.kotlin/
+
+# Firebase/Android local credentials and generated config
+/android/app/google-services.json
+**/firebase-debug.log
+**/firebase-export-*/
+android/key.properties
+**/*.keystore
+**/*.jks
+
+# Local secrets (TMDB token, signing passwords, emulator credentials)
+/secrets/
+.env
+.env.*
+!.env.example
+
+# Local IDE launch configurations may contain --dart-define secrets
+.vscode/launch.json

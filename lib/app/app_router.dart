@@ -138,9 +138,13 @@ GoRouter createAppRouter({
       ),
       GoRoute(
         path: '/user/seats/:showtimeId',
-        builder: (context, state) => SeatSelectionScreen(
-          showtimeId: state.pathParameters['showtimeId']!,
-        ),
+        builder: (context, state) {
+          final extra = state.extra;
+          return SeatSelectionScreen(
+            showtimeId: state.pathParameters['showtimeId']!,
+            initialData: extra is SeatSelectionArgs ? extra : null,
+          );
+        },
       ),
       GoRoute(
         path: '/user/concessions',

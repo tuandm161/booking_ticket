@@ -181,6 +181,12 @@ class _AdminMovieFormScreenState extends ConsumerState<AdminMovieFormScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          tooltip: 'Quay lại danh sách phim',
+          onPressed: () =>
+              context.canPop() ? context.pop() : context.go('/admin/movies'),
+          icon: const Icon(Icons.arrow_back_rounded),
+        ),
         title: Text(widget.movieId == null ? 'Thêm phim' : 'Sửa phim'),
       ),
       body: Form(

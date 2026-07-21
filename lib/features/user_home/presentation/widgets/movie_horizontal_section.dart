@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_underscores
 import 'package:flutter/material.dart';
+import '../../../../shared/widgets/cinema_decor.dart';
 import 'movie_poster_card.dart';
 
 class MovieHorizontalSection extends StatelessWidget {
@@ -16,23 +17,7 @@ class MovieHorizontalSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-            ),
-            if (onSeeAll != null)
-              TextButton(onPressed: onSeeAll, child: const Text('Xem tất cả')),
-          ],
-        ),
-      ),
+      CinemaSectionTitle(title: title, action: onSeeAll),
       const SizedBox(height: 10),
       SizedBox(
         height: 230,

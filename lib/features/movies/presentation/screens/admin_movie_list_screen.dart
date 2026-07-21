@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/app_async_value_widget.dart';
 import '../../../../core/widgets/confirm_dialog.dart';
+import '../../../../shared/widgets/admin_bottom_navigation.dart';
 import '../../data/movie_repository.dart';
 import '../../models/movie.dart';
 import '../../providers/movie_providers.dart';
@@ -107,6 +108,7 @@ class _AdminMovieListScreenState extends ConsumerState<AdminMovieListScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const AdminBottomNavigation(index: 1),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/admin/movies/new'),
         icon: const Icon(Icons.add),

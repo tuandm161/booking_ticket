@@ -13,10 +13,30 @@ class ProductOrderCard extends StatelessWidget {
   final ValueChanged<int> onChanged;
   @override
   Widget build(BuildContext context) => Card(
-    child: ListTile(
-      title: Text(product.name),
-      subtitle: Text('${product.price} đ'),
-      trailing: _QuantityControl(quantity: quantity, onChanged: onChanged),
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  product.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text('${product.price} đ'),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          _QuantityControl(quantity: quantity, onChanged: onChanged),
+        ],
+      ),
     ),
   );
 }
