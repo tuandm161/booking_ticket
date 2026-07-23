@@ -8,6 +8,8 @@ import '../models/cinema_seat.dart';
 
 class RoomDraft {
   const RoomDraft({
+    this.cinemaId = '',
+    this.cinemaName = '',
     required this.name,
     required this.roomType,
     required this.rowCount,
@@ -16,17 +18,21 @@ class RoomDraft {
     required this.coupleSeatCount,
     this.isActive = true,
   });
+  final String cinemaId;
+  final String cinemaName;
   final String name;
   final RoomType roomType;
   final int rowCount, seatsPerRow, vipRowStart, coupleSeatCount;
   final bool isActive;
   List<CinemaSeat> get previewSeats => generateSeats(
-    rowCount: rowCount,
-    seatsPerRow: seatsPerRow,
-    vipRowStart: vipRowStart,
-    coupleSeatCount: coupleSeatCount,
-  );
+        rowCount: rowCount,
+        seatsPerRow: seatsPerRow,
+        vipRowStart: vipRowStart,
+        coupleSeatCount: coupleSeatCount,
+      );
   RoomDraft copyWith({
+    String? cinemaId,
+    String? cinemaName,
     String? name,
     RoomType? roomType,
     int? rowCount,
@@ -34,15 +40,18 @@ class RoomDraft {
     int? vipRowStart,
     int? coupleSeatCount,
     bool? isActive,
-  }) => RoomDraft(
-    name: name ?? this.name,
-    roomType: roomType ?? this.roomType,
-    rowCount: rowCount ?? this.rowCount,
-    seatsPerRow: seatsPerRow ?? this.seatsPerRow,
-    vipRowStart: vipRowStart ?? this.vipRowStart,
-    coupleSeatCount: coupleSeatCount ?? this.coupleSeatCount,
-    isActive: isActive ?? this.isActive,
-  );
+  }) =>
+      RoomDraft(
+        cinemaId: cinemaId ?? this.cinemaId,
+        cinemaName: cinemaName ?? this.cinemaName,
+        name: name ?? this.name,
+        roomType: roomType ?? this.roomType,
+        rowCount: rowCount ?? this.rowCount,
+        seatsPerRow: seatsPerRow ?? this.seatsPerRow,
+        vipRowStart: vipRowStart ?? this.vipRowStart,
+        coupleSeatCount: coupleSeatCount ?? this.coupleSeatCount,
+        isActive: isActive ?? this.isActive,
+      );
 }
 
 class RoomRepository {
@@ -77,6 +86,8 @@ class RoomRepository {
     final now = Timestamp.now();
     final room = CinemaRoom(
       name: draft.name.trim(),
+      cinemaId: draft.cinemaId,
+      cinemaName: draft.cinemaName,
       roomType: draft.roomType,
       rowCount: draft.rowCount,
       seatsPerRow: draft.seatsPerRow,
@@ -122,6 +133,8 @@ class RoomRepository {
     final now = Timestamp.now();
     final room = CinemaRoom(
       id: roomId,
+      cinemaId: draft.cinemaId.isNotEmpty ? draft.cinemaId : old.cinemaId,
+      cinemaName: draft.cinemaName.isNotEmpty ? draft.cinemaName : old.cinemaName,
       name: draft.name.trim(),
       roomType: draft.roomType,
       rowCount: draft.rowCount,

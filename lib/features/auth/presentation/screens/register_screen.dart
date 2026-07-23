@@ -88,8 +88,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             onPressed: ref.watch(authControllerProvider).isLoading
                 ? null
                 : _submit,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+            ),
             child: ref.watch(authControllerProvider).isLoading
-                ? const CircularProgressIndicator()
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
                 : const Text('Đăng ký'),
           ),
           TextButton(

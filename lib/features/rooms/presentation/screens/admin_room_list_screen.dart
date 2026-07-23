@@ -8,6 +8,19 @@ import '../../../../shared/widgets/admin_bottom_navigation.dart';
 import '../../providers/room_providers.dart';
 import '../widgets/room_card.dart';
 
+import '../../../../shared/widgets/admin_filter_sort_header.dart';
+import '../../../../shared/widgets/app_press_scale.dart';
+
+enum AdminRoomSortField { name, totalSeats, createdAt }
+
+extension AdminRoomSortFieldX on AdminRoomSortField {
+  String get label => switch (this) {
+        AdminRoomSortField.name => 'Tên phòng (A-Z)',
+        AdminRoomSortField.totalSeats => 'Sức chứa (Ghế)',
+        AdminRoomSortField.createdAt => 'Ngày tạo',
+      };
+}
+
 class AdminRoomListScreen extends ConsumerStatefulWidget {
   const AdminRoomListScreen({super.key});
   @override
@@ -16,7 +29,9 @@ class AdminRoomListScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminRoomListScreenState extends ConsumerState<AdminRoomListScreen> {
-  bool _includeInactive = true;
+  AdminActiveStatusFilter _activeStatus = AdminActiveStatusFilter.all;
+  AdminRoomSortField _sortField = AdminRoomSortField.name;
+
   @override
   Widget build(BuildContext context) {
     final rooms = ref.watch(roomsProvider);
@@ -33,26 +48,42 @@ class _AdminRoomListScreenState extends ConsumerState<AdminRoomListScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: true, label: Text('Tất cả')),
-                ButtonSegment(value: false, label: Text('Đang hoạt động')),
-              ],
-              selected: {_includeInactive},
-              onSelectionChanged: (value) =>
-                  setState(() => _includeInactive = value.first),
-            ),
+          AdminFilterSortHeader<AdminRoomSortField>(
+            activeStatus: _activeStatus,
+            onActiveStatusChanged: (val) => setState(() => _activeStatus = val),
+            sortValue: _sortField,
+            sortItems: AdminRoomSortField.values
+                .map((sf) => DropdownMenuItem(value: sf, child: Text(sf.label)))
+                .toList(),
+            onSortChanged: (val) {
+              if (val != null) setState(() => _sortField = val);
+            },
           ),
           Expanded(
             child: AppAsyncValueWidget(
               value: rooms,
               onRetry: () => ref.invalidate(roomsProvider),
               data: (items) {
-                final visible = _includeInactive
-                    ? items
-                    : items.where((room) => room.isActive).toList();
+                final visible = items.where((room) {
+                  return switch (_activeStatus) {
+                    AdminActiveStatusFilter.all => true,
+                    AdminActiveStatusFilter.active => room.isActive,
+                    AdminActiveStatusFilter.hidden => !room.isActive,
+                  };
+                }).toList();
+
+                visible.sort((a, b) {
+                  return switch (_sortField) {
+                    AdminRoomSortField.name =>
+                      a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                    AdminRoomSortField.totalSeats =>
+                      b.seats.length.compareTo(a.seats.length),
+                    AdminRoomSortField.createdAt =>
+                      (b.createdAt ?? DateTime(0))
+                          .compareTo(a.createdAt ?? DateTime(0)),
+                  };
+                });
+
                 if (visible.isEmpty)
                   return const Center(child: Text('Chưa có phòng chiếu.'));
                 return ListView.builder(
@@ -77,10 +108,12 @@ class _AdminRoomListScreenState extends ConsumerState<AdminRoomListScreen> {
         ],
       ),
       bottomNavigationBar: const AdminBottomNavigation(index: 4),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/admin/rooms/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Thêm phòng'),
+      floatingActionButton: AppPressScale(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push('/admin/rooms/new'),
+          icon: const Icon(Icons.add),
+          label: const Text('Thêm phòng'),
+        ),
       ),
     );
   }

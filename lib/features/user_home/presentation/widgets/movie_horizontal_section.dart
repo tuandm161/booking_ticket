@@ -20,7 +20,7 @@ class MovieHorizontalSection extends StatelessWidget {
       CinemaSectionTitle(title: title, action: onSeeAll),
       const SizedBox(height: 10),
       SizedBox(
-        height: 230,
+        height: 260,
         child: ListView.separated(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           scrollDirection: Axis.horizontal,

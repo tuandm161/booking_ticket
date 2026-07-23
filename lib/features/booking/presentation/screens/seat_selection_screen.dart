@@ -110,7 +110,36 @@ class _SeatSelectionScreenState extends ConsumerState<SeatSelectionScreen> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Chọn ghế')),
+        backgroundColor: const Color(0xFF0E0E0E),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF0E0E0E),
+          foregroundColor: Colors.white,
+          title: widget.initialData != null
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.initialData!.movie.title.toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      '${widget.initialData!.room.name} · '
+                      '${widget.initialData!.showtime.startTime.hour.toString().padLeft(2, '0')}:'
+                      '${widget.initialData!.showtime.startTime.minute.toString().padLeft(2, '0')}',
+                      style: const TextStyle(
+                        color: Colors.white60,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                )
+              : const Text('Chọn ghế', style: TextStyle(color: Colors.white)),
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
         body: FutureBuilder<List<Object?>>(
           future: _loadFuture,
           initialData: widget.initialData == null

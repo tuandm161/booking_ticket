@@ -41,11 +41,13 @@ class _CardPaymentFormScreenState extends State<CardPaymentFormScreen> {
                 ? null
                 : 'Nhập đủ 16 chữ số',
           ),
+          const SizedBox(height: 12),
           TextFormField(
             controller: holder,
             decoration: const InputDecoration(labelText: 'Chủ thẻ'),
             validator: (v) => v == null || v.trim().isEmpty ? 'Bắt buộc' : null,
           ),
+          const SizedBox(height: 12),
           Row(
             children: [
               Expanded(

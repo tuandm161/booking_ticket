@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../auth/providers/auth_controller.dart';
 import '../../../../shared/widgets/admin_bottom_navigation.dart';
+import '../../../../shared/widgets/app_press_scale.dart';
 
 class AdminManagementMenuScreen extends ConsumerWidget {
   const AdminManagementMenuScreen({super.key});
@@ -13,6 +14,11 @@ class AdminManagementMenuScreen extends ConsumerWidget {
     body: ListView(
       padding: const EdgeInsets.all(16),
       children: [
+        _Link(
+          label: 'Cụm rạp',
+          icon: Icons.movie_creation_rounded,
+          path: '/admin/cinemas',
+        ),
         _Link(
           label: 'Phòng chiếu',
           icon: Icons.meeting_room,
@@ -26,20 +32,22 @@ class AdminManagementMenuScreen extends ConsumerWidget {
         _Link(label: 'Combo', icon: Icons.fastfood, path: '/admin/combos'),
         _Link(label: 'Voucher', icon: Icons.discount, path: '/admin/vouchers'),
         const SizedBox(height: 12),
-        OutlinedButton(
-          onPressed: () async {
-            await ref.read(authControllerProvider.notifier).signOut();
-            if (!context.mounted) return;
-            final state = ref.read(authControllerProvider);
-            if (state.hasError) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.error.toString())));
-            } else {
-              context.go('/login');
-            }
-          },
-          child: const Text('Đăng xuất'),
+        AppPressScale(
+          child: OutlinedButton(
+            onPressed: () async {
+              await ref.read(authControllerProvider.notifier).signOut();
+              if (!context.mounted) return;
+              final state = ref.read(authControllerProvider);
+              if (state.hasError) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.error.toString())));
+              } else {
+                context.go('/login');
+              }
+            },
+            child: const Text('Đăng xuất'),
+          ),
         ),
       ],
     ),
@@ -51,12 +59,14 @@ class _Link extends StatelessWidget {
   final String label, path;
   final IconData icon;
   @override
-  Widget build(BuildContext context) => Card(
-    child: ListTile(
-      leading: Icon(icon),
-      title: Text(label),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => context.push(path),
+  Widget build(BuildContext context) => AppPressScale(
+    onTap: () => context.push(path),
+    child: Card(
+      child: ListTile(
+        leading: Icon(icon),
+        title: Text(label),
+        trailing: const Icon(Icons.chevron_right),
+      ),
     ),
   );
 }

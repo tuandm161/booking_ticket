@@ -9,6 +9,19 @@ import '../../providers/showtime_providers.dart';
 import '../widgets/showtime_admin_card.dart';
 import '../widgets/showtime_date_filter.dart';
 
+import '../../../../shared/widgets/admin_filter_sort_header.dart';
+import '../../../../shared/widgets/app_press_scale.dart';
+
+enum AdminShowtimeSortField { startTime, price, movieTitle }
+
+extension AdminShowtimeSortFieldX on AdminShowtimeSortField {
+  String get label => switch (this) {
+        AdminShowtimeSortField.startTime => 'Giờ chiếu',
+        AdminShowtimeSortField.price => 'Giá vé',
+        AdminShowtimeSortField.movieTitle => 'Tên phim (A-Z)',
+      };
+}
+
 class AdminShowtimeListScreen extends ConsumerStatefulWidget {
   const AdminShowtimeListScreen({super.key});
   @override
@@ -21,7 +34,9 @@ class _AdminShowtimeListScreenState
   DateTime _date = DateTime.now();
   String? _room;
   String _query = '';
-  bool _onlyActive = false;
+  AdminActiveStatusFilter _activeStatus = AdminActiveStatusFilter.all;
+  AdminShowtimeSortField _sortField = AdminShowtimeSortField.startTime;
+
   @override
   Widget build(BuildContext context) {
     final showtimes = ref.watch(showtimesProvider);
@@ -34,50 +49,63 @@ class _AdminShowtimeListScreenState
             onChanged: (date) => setState(() => _date = date),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: const InputDecoration(
-                      hintText: 'Tìm theo phim hoặc phòng',
-                      prefixIcon: Icon(Icons.search_rounded),
-                    ),
-                    onChanged: (value) =>
-                        setState(() => _query = value.trim().toLowerCase()),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                FilterChip(
-                  label: const Text('Active'),
-                  selected: _onlyActive,
-                  onSelected: (value) => setState(() => _onlyActive = value),
-                ),
-              ],
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 2),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Tìm theo phim hoặc phòng',
+                prefixIcon: Icon(Icons.search_rounded),
+              ),
+              onChanged: (value) =>
+                  setState(() => _query = value.trim().toLowerCase()),
             ),
+          ),
+          AdminFilterSortHeader<AdminShowtimeSortField>(
+            activeStatus: _activeStatus,
+            onActiveStatusChanged: (val) => setState(() => _activeStatus = val),
+            sortValue: _sortField,
+            sortItems: AdminShowtimeSortField.values
+                .map((sf) => DropdownMenuItem(value: sf, child: Text(sf.label)))
+                .toList(),
+            onSortChanged: (val) {
+              if (val != null) setState(() => _sortField = val);
+            },
           ),
           Expanded(
             child: AppAsyncValueWidget(
               value: showtimes,
               onRetry: () => ref.invalidate(showtimesProvider),
               data: (items) {
-                final filtered = items
-                    .where(
-                      (item) =>
-                          item.startTime.year == _date.year &&
-                          item.startTime.month == _date.month &&
-                          item.startTime.day == _date.day &&
-                          (_room == null || item.roomId == _room),
-                    )
-                    .where(
-                      (item) =>
-                          (!_onlyActive || item.isActive) &&
-                          (_query.isEmpty ||
-                              item.movieTitle.toLowerCase().contains(_query) ||
-                              item.roomName.toLowerCase().contains(_query)),
-                    )
-                    .toList();
-                filtered.sort((a, b) => a.startTime.compareTo(b.startTime));
+                final filtered = items.where((item) {
+                  final matchesDate = item.startTime.year == _date.year &&
+                      item.startTime.month == _date.month &&
+                      item.startTime.day == _date.day;
+                  final matchesRoom = _room == null || item.roomId == _room;
+                  final matchesActive = switch (_activeStatus) {
+                    AdminActiveStatusFilter.all => true,
+                    AdminActiveStatusFilter.active => item.isActive,
+                    AdminActiveStatusFilter.hidden => !item.isActive,
+                  };
+                  final matchesQuery = _query.isEmpty ||
+                      item.movieTitle.toLowerCase().contains(_query) ||
+                      item.roomName.toLowerCase().contains(_query);
+                  return matchesDate &&
+                      matchesRoom &&
+                      matchesActive &&
+                      matchesQuery;
+                }).toList();
+
+                filtered.sort((a, b) {
+                  return switch (_sortField) {
+                    AdminShowtimeSortField.startTime =>
+                      a.startTime.compareTo(b.startTime),
+                    AdminShowtimeSortField.price =>
+                      b.basePrice.compareTo(a.basePrice),
+                    AdminShowtimeSortField.movieTitle => a.movieTitle
+                        .toLowerCase()
+                        .compareTo(b.movieTitle.toLowerCase()),
+                  };
+                });
+
                 if (filtered.isEmpty)
                   return const Center(
                     child: Text('Chưa có suất chiếu trong ngày này.'),
@@ -103,10 +131,12 @@ class _AdminShowtimeListScreenState
         ],
       ),
       bottomNavigationBar: const AdminBottomNavigation(index: 2),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/admin/showtimes/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Thêm suất'),
+      floatingActionButton: AppPressScale(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push('/admin/showtimes/new'),
+          icon: const Icon(Icons.add),
+          label: const Text('Thêm suất'),
+        ),
       ),
     );
   }

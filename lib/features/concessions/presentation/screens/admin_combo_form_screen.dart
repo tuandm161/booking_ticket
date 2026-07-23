@@ -146,8 +146,18 @@ class _AdminComboFormScreenState extends ConsumerState<AdminComboFormScreen> {
                 ),
                 FilledButton(
                   onPressed: _saving ? null : _save,
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
                   child: _saving
-                      ? const CircularProgressIndicator()
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text('Lưu'),
                 ),
               ],

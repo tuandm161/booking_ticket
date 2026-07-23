@@ -48,7 +48,35 @@ class TicketCard extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  Chip(label: Text(upcoming ? 'Sắp diễn ra' : 'Đã xem')),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: upcoming
+                          ? const Color(0xFFD7262D).withValues(alpha: 0.12)
+                          : Colors.grey.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: upcoming
+                            ? const Color(0xFFD7262D)
+                            : Colors.grey.shade400,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Text(
+                      upcoming ? 'Sắp diễn ra' : 'Đã xem',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: upcoming
+                            ? const Color(0xFFD7262D)
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.grey.shade300
+                                : Colors.grey.shade800),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

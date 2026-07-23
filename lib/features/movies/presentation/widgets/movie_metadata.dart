@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../models/movie.dart';
+import 'movie_status_chip.dart';
 
 class MovieMetadata extends StatelessWidget {
   const MovieMetadata({super.key, required this.movie});
@@ -10,8 +11,9 @@ class MovieMetadata extends StatelessWidget {
     children: [
       Wrap(
         spacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          Chip(label: Text(movie.status.label)),
+          MovieStatusChip(status: movie.status),
           if (movie.ageRating.isNotEmpty) Chip(label: Text(movie.ageRating)),
           Chip(label: Text('${movie.durationMinutes} phút')),
         ],

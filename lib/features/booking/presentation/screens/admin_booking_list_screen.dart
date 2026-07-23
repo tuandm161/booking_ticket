@@ -56,23 +56,69 @@ class _AdminBookingListScreenState
               ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Row(
                   children: [
                     ChoiceChip(
                       label: const Text('Tất cả'),
                       selected: upcoming == null,
+                      selectedColor: const Color(0xFFD7262D),
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF2C2C2C)
+                              : const Color(0xFFEEEEEE),
+                      labelStyle: TextStyle(
+                        color: upcoming == null
+                            ? Colors.white
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : const Color(0xFF212121)),
+                        fontWeight:
+                            upcoming == null ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 12,
+                      ),
                       onSelected: (_) => setState(() => upcoming = null),
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
                       label: const Text('Sắp tới'),
                       selected: upcoming == true,
+                      selectedColor: const Color(0xFFD7262D),
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF2C2C2C)
+                              : const Color(0xFFEEEEEE),
+                      labelStyle: TextStyle(
+                        color: upcoming == true
+                            ? Colors.white
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : const Color(0xFF212121)),
+                        fontWeight:
+                            upcoming == true ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 12,
+                      ),
                       onSelected: (_) => setState(() => upcoming = true),
                     ),
                     const SizedBox(width: 8),
                     ChoiceChip(
                       label: const Text('Đã qua'),
                       selected: upcoming == false,
+                      selectedColor: const Color(0xFFD7262D),
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF2C2C2C)
+                              : const Color(0xFFEEEEEE),
+                      labelStyle: TextStyle(
+                        color: upcoming == false
+                            ? Colors.white
+                            : (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : const Color(0xFF212121)),
+                        fontWeight:
+                            upcoming == false ? FontWeight.bold : FontWeight.w600,
+                        fontSize: 12,
+                      ),
                       onSelected: (_) => setState(() => upcoming = false),
                     ),
                     const SizedBox(width: 8),

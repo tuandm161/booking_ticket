@@ -20,7 +20,16 @@ class RoomCard extends StatelessWidget {
     );
     return Card(
       child: ListTile(
-        leading: CircleAvatar(child: Text(room.name.replaceAll('Phòng ', ''))),
+        leading: CircleAvatar(
+          backgroundColor: const Color(0xFFD7262D).withValues(alpha: 0.12),
+          child: Text(
+            RegExp(r'\d+').firstMatch(room.name)?.group(0) ?? 'P',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFFD7262D),
+            ),
+          ),
+        ),
         title: Text(room.name),
         subtitle: Text(
           '${room.roomType.label} • ${room.seats.length} ghế • Sức chứa $capacity',

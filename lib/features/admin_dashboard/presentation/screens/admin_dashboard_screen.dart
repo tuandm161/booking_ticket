@@ -51,35 +51,42 @@ class AdminDashboardScreen extends ConsumerWidget {
                       'Theo dõi doanh thu, suất chiếu và nhịp đập CineBook.',
                   icon: Icons.insights_rounded,
                 ),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    SizedBox(
-                      width: 170,
-                      child: MetricCard(
-                        label: 'Tổng booking',
-                        value: '${m.totalBookings}',
-                        icon: Icons.receipt_long,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: MetricCard(
-                        label: 'Booking hôm nay',
-                        value: '${m.todayBookings}',
-                        icon: Icons.today,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 170,
-                      child: MetricCard(
-                        label: 'Vé/người đã bán',
-                        value: '${m.ticketsSold}',
-                        icon: Icons.people,
-                      ),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final columns = constraints.maxWidth > 540 ? 3 : 2;
+                    final cardWidth =
+                        (constraints.maxWidth - (8 * (columns - 1))) / columns;
+                    return Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        SizedBox(
+                          width: cardWidth,
+                          child: MetricCard(
+                            label: 'Tổng booking',
+                            value: '${m.totalBookings}',
+                            icon: Icons.receipt_long,
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: MetricCard(
+                            label: 'Booking hôm nay',
+                            value: '${m.todayBookings}',
+                            icon: Icons.today,
+                          ),
+                        ),
+                        SizedBox(
+                          width: cardWidth,
+                          child: MetricCard(
+                            label: 'Vé/người đã bán',
+                            value: '${m.ticketsSold}',
+                            icon: Icons.people,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 RevenueSummaryCard(
                   today: m.todayRevenue,

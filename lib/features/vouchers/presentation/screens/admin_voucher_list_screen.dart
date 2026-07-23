@@ -8,6 +8,19 @@ import '../../../../core/services/seed_provider.dart';
 import '../../providers/voucher_providers.dart';
 import '../widgets/voucher_admin_card.dart';
 
+import '../../../../shared/widgets/admin_filter_sort_header.dart';
+import '../../../../shared/widgets/app_press_scale.dart';
+
+enum AdminVoucherSortField { code, discountValue, endDate }
+
+extension AdminVoucherSortFieldX on AdminVoucherSortField {
+  String get label => switch (this) {
+        AdminVoucherSortField.code => 'Mã voucher (A-Z)',
+        AdminVoucherSortField.discountValue => 'Giá trị giảm',
+        AdminVoucherSortField.endDate => 'Ngày hết hạn',
+      };
+}
+
 class AdminVoucherListScreen extends ConsumerStatefulWidget {
   const AdminVoucherListScreen({super.key});
   @override
@@ -18,7 +31,8 @@ class AdminVoucherListScreen extends ConsumerStatefulWidget {
 class _AdminVoucherListScreenState
     extends ConsumerState<AdminVoucherListScreen> {
   String _query = '';
-  bool _onlyActive = false;
+  AdminActiveStatusFilter _activeStatus = AdminActiveStatusFilter.all;
+  AdminVoucherSortField _sortField = AdminVoucherSortField.code;
 
   @override
   Widget build(BuildContext context) {
@@ -47,31 +61,47 @@ class _AdminVoucherListScreenState
                   setState(() => _query = value.trim().toLowerCase()),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: FilterChip(
-                label: const Text('Chỉ voucher đang bật'),
-                selected: _onlyActive,
-                onSelected: (value) => setState(() => _onlyActive = value),
-              ),
-            ),
+          AdminFilterSortHeader<AdminVoucherSortField>(
+            activeStatus: _activeStatus,
+            onActiveStatusChanged: (val) => setState(() => _activeStatus = val),
+            activeLabel: 'Đang bật',
+            hiddenLabel: 'Tạm ẩn',
+            sortValue: _sortField,
+            sortItems: AdminVoucherSortField.values
+                .map((sf) => DropdownMenuItem(value: sf, child: Text(sf.label)))
+                .toList(),
+            onSortChanged: (val) {
+              if (val != null) setState(() => _sortField = val);
+            },
           ),
           Expanded(
             child: AppAsyncValueWidget(
               value: data,
               onRetry: () => ref.invalidate(vouchersProvider),
               data: (items) {
-                final filtered = items
-                    .where(
-                      (v) =>
-                          (_query.isEmpty ||
-                              v.code.toLowerCase().contains(_query) ||
-                              v.description.toLowerCase().contains(_query)) &&
-                          (!_onlyActive || v.isActive),
-                    )
-                    .toList();
+                final filtered = items.where((v) {
+                  final matchesQuery = _query.isEmpty ||
+                      v.code.toLowerCase().contains(_query) ||
+                      v.description.toLowerCase().contains(_query);
+                  final matchesActive = switch (_activeStatus) {
+                    AdminActiveStatusFilter.all => true,
+                    AdminActiveStatusFilter.active => v.isActive,
+                    AdminActiveStatusFilter.hidden => !v.isActive,
+                  };
+                  return matchesQuery && matchesActive;
+                }).toList();
+
+                filtered.sort((a, b) {
+                  return switch (_sortField) {
+                    AdminVoucherSortField.code =>
+                      a.code.toLowerCase().compareTo(b.code.toLowerCase()),
+                    AdminVoucherSortField.discountValue =>
+                      b.discountValue.compareTo(a.discountValue),
+                    AdminVoucherSortField.endDate =>
+                      a.endDate.compareTo(b.endDate),
+                  };
+                });
+
                 if (filtered.isEmpty)
                   return const Center(child: Text('Không có voucher phù hợp.'));
                 return ListView.builder(
@@ -95,10 +125,12 @@ class _AdminVoucherListScreenState
         ],
       ),
       bottomNavigationBar: const AdminBottomNavigation(index: 4),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/admin/vouchers/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Thêm'),
+      floatingActionButton: AppPressScale(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push('/admin/vouchers/new'),
+          icon: const Icon(Icons.add),
+          label: const Text('Thêm'),
+        ),
       ),
     );
   }

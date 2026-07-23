@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../../app/app_theme.dart';
 
 /// A reusable cinematic header that gives screens a clear visual hierarchy
 /// without relying on remote images or heavyweight raster assets.
@@ -35,10 +36,10 @@ class CinemaHero extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(28),
-          gradient: LinearGradient(
+          gradient: const LinearGradient(
             colors: [
-              colors.primary.withValues(alpha: .95),
-              const Color(0xff24204b),
+              AppTheme.cgvRed,
+              Color(0xFF8B0000),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -119,7 +120,6 @@ class CinemaSectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 4, 12, 10),
       child: Row(
@@ -128,7 +128,7 @@ class CinemaSectionTitle extends StatelessWidget {
             width: 4,
             height: 23,
             decoration: BoxDecoration(
-              color: colors.secondary,
+              color: AppTheme.cgvRed,
               borderRadius: BorderRadius.circular(4),
             ),
           ),

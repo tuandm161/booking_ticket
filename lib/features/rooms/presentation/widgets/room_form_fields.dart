@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../cinemas/models/cinema.dart';
 import '../../models/cinema_room.dart';
 
 class RoomFormFields extends StatelessWidget {
@@ -13,7 +14,11 @@ class RoomFormFields extends StatelessWidget {
     required this.coupleController,
     required this.isActive,
     required this.onActiveChanged,
+    this.selectedCinemaId,
+    this.cinemas = const [],
+    this.onCinemaChanged,
   });
+
   final TextEditingController nameController,
       rowController,
       seatsController,
@@ -23,42 +28,61 @@ class RoomFormFields extends StatelessWidget {
   final ValueChanged<RoomType?> onRoomTypeChanged;
   final bool isActive;
   final ValueChanged<bool> onActiveChanged;
+  final String? selectedCinemaId;
+  final List<Cinema> cinemas;
+  final ValueChanged<Cinema?>? onCinemaChanged;
+
   @override
   Widget build(BuildContext context) => Column(
-    children: [
-      TextFormField(
-        controller: nameController,
-        decoration: const InputDecoration(labelText: 'Tên phòng'),
-        validator: (value) => value == null || value.trim().isEmpty
-            ? 'Tên phòng không được để trống.'
-            : null,
-      ),
-      const SizedBox(height: 12),
-      DropdownButtonFormField<RoomType>(
-        initialValue: roomType,
-        decoration: const InputDecoration(labelText: 'Loại phòng'),
-        items: RoomType.values
-            .map(
-              (type) => DropdownMenuItem(value: type, child: Text(type.label)),
-            )
-            .toList(),
-        onChanged: onRoomTypeChanged,
-      ),
-      const SizedBox(height: 12),
-      _numberField(rowController, 'Số hàng (1–20)'),
-      const SizedBox(height: 12),
-      _numberField(seatsController, 'Số ghế mỗi hàng (2–20)'),
-      const SizedBox(height: 12),
-      _numberField(vipController, 'Hàng bắt đầu VIP (0 = không có)'),
-      const SizedBox(height: 12),
-      _numberField(coupleController, 'Số ghế đôi hàng cuối'),
-      SwitchListTile(
-        value: isActive,
-        onChanged: onActiveChanged,
-        title: const Text('Đang hoạt động'),
-      ),
-    ],
-  );
+        children: [
+          if (cinemas.isNotEmpty) ...[
+            DropdownButtonFormField<Cinema>(
+              initialValue:
+                  cinemas.where((c) => c.id == selectedCinemaId).firstOrNull,
+              decoration: const InputDecoration(labelText: 'Cụm Rạp'),
+              items: cinemas
+                  .map(
+                    (c) => DropdownMenuItem(value: c, child: Text(c.name)),
+                  )
+                  .toList(),
+              onChanged: onCinemaChanged,
+            ),
+            const SizedBox(height: 12),
+          ],
+          TextFormField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Tên phòng'),
+            validator: (value) => value == null || value.trim().isEmpty
+                ? 'Tên phòng không được để trống.'
+                : null,
+          ),
+          const SizedBox(height: 12),
+          DropdownButtonFormField<RoomType>(
+            initialValue: roomType,
+            decoration: const InputDecoration(labelText: 'Loại phòng'),
+            items: RoomType.values
+                .map(
+                  (type) => DropdownMenuItem(value: type, child: Text(type.label)),
+                )
+                .toList(),
+            onChanged: onRoomTypeChanged,
+          ),
+          const SizedBox(height: 12),
+          _numberField(rowController, 'Số hàng (1–20)'),
+          const SizedBox(height: 12),
+          _numberField(seatsController, 'Số ghế mỗi hàng (2–20)'),
+          const SizedBox(height: 12),
+          _numberField(vipController, 'Hàng bắt đầu VIP (0 = không có)'),
+          const SizedBox(height: 12),
+          _numberField(coupleController, 'Số ghế đôi hàng cuối'),
+          SwitchListTile(
+            value: isActive,
+            onChanged: onActiveChanged,
+            title: const Text('Đang hoạt động'),
+          ),
+        ],
+      );
+
   Widget _numberField(TextEditingController controller, String label) =>
       TextFormField(
         controller: controller,

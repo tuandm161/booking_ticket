@@ -9,6 +9,19 @@ import '../../models/product.dart';
 import '../../providers/product_providers.dart';
 import '../widgets/product_admin_card.dart';
 
+import '../../../../shared/widgets/admin_filter_sort_header.dart';
+import '../../../../shared/widgets/app_press_scale.dart';
+
+enum AdminProductSortField { name, price, createdAt }
+
+extension AdminProductSortFieldX on AdminProductSortField {
+  String get label => switch (this) {
+        AdminProductSortField.name => 'Tên sản phẩm (A-Z)',
+        AdminProductSortField.price => 'Giá tiền',
+        AdminProductSortField.createdAt => 'Ngày tạo',
+      };
+}
+
 class AdminProductListScreen extends ConsumerStatefulWidget {
   const AdminProductListScreen({super.key});
   @override
@@ -20,7 +33,8 @@ class _AdminProductListScreenState
     extends ConsumerState<AdminProductListScreen> {
   String _query = '';
   ProductCategory? _category;
-  bool _onlyAvailable = false;
+  AdminActiveStatusFilter _activeStatus = AdminActiveStatusFilter.all;
+  AdminProductSortField _sortField = AdminProductSortField.name;
 
   @override
   Widget build(BuildContext context) {
@@ -49,33 +63,71 @@ class _AdminProductListScreenState
                   setState(() => _query = value.trim().toLowerCase()),
             ),
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                ChoiceChip(
-                  label: const Text('Tất cả'),
-                  selected: _category == null,
-                  onSelected: (_) => setState(() => _category = null),
-                ),
-                const SizedBox(width: 8),
-                ...ProductCategory.values.map(
-                  (category) => Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(
-                      label: Text(category.label),
-                      selected: _category == category,
-                      onSelected: (_) => setState(() => _category = category),
+          AdminFilterSortHeader<AdminProductSortField>(
+            activeStatus: _activeStatus,
+            onActiveStatusChanged: (val) => setState(() => _activeStatus = val),
+            activeLabel: 'Đang bán',
+            hiddenLabel: 'Tạm ẩn',
+            sortValue: _sortField,
+            sortItems: AdminProductSortField.values
+                .map((sf) => DropdownMenuItem(value: sf, child: Text(sf.label)))
+                .toList(),
+            onSortChanged: (val) {
+              if (val != null) setState(() => _sortField = val);
+            },
+            extraFilterWidget: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text('Tất cả danh mục'),
+                    selected: _category == null,
+                    selectedColor: const Color(0xFFD7262D),
+                    backgroundColor:
+                        Theme.of(context).brightness == Brightness.dark
+                            ? const Color(0xFF2C2C2C)
+                            : const Color(0xFFEEEEEE),
+                    labelStyle: TextStyle(
+                      color: _category == null
+                          ? Colors.white
+                          : (Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : const Color(0xFF212121)),
+                      fontWeight:
+                          _category == null ? FontWeight.bold : FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                    onSelected: (_) => setState(() => _category = null),
+                  ),
+                  const SizedBox(width: 8),
+                  ...ProductCategory.values.map(
+                    (category) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(category.label),
+                        selected: _category == category,
+                        selectedColor: const Color(0xFFD7262D),
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? const Color(0xFF2C2C2C)
+                                : const Color(0xFFEEEEEE),
+                        labelStyle: TextStyle(
+                          color: _category == category
+                              ? Colors.white
+                              : (Theme.of(context).brightness == Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF212121)),
+                          fontWeight: _category == category
+                              ? FontWeight.bold
+                              : FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                        onSelected: (_) => setState(() => _category = category),
+                      ),
                     ),
                   ),
-                ),
-                FilterChip(
-                  label: const Text('Đang bán'),
-                  selected: _onlyAvailable,
-                  onSelected: (value) => setState(() => _onlyAvailable = value),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -83,15 +135,30 @@ class _AdminProductListScreenState
               value: data,
               onRetry: () => ref.invalidate(productsProvider),
               data: (items) {
-                final filtered = items
-                    .where(
-                      (p) =>
-                          (_query.isEmpty ||
-                              p.name.toLowerCase().contains(_query)) &&
-                          (_category == null || p.category == _category) &&
-                          (!_onlyAvailable || p.isAvailable),
-                    )
-                    .toList();
+                final filtered = items.where((p) {
+                  final matchesQuery = _query.isEmpty ||
+                      p.name.toLowerCase().contains(_query);
+                  final matchesCategory =
+                      _category == null || p.category == _category;
+                  final matchesActive = switch (_activeStatus) {
+                    AdminActiveStatusFilter.all => true,
+                    AdminActiveStatusFilter.active => p.isAvailable,
+                    AdminActiveStatusFilter.hidden => !p.isAvailable,
+                  };
+                  return matchesQuery && matchesCategory && matchesActive;
+                }).toList();
+
+                filtered.sort((a, b) {
+                  return switch (_sortField) {
+                    AdminProductSortField.name =>
+                      a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                    AdminProductSortField.price => b.price.compareTo(a.price),
+                    AdminProductSortField.createdAt =>
+                      (b.createdAt ?? DateTime(0))
+                          .compareTo(a.createdAt ?? DateTime(0)),
+                  };
+                });
+
                 if (filtered.isEmpty)
                   return const Center(
                     child: Text('Không có sản phẩm phù hợp.'),
@@ -117,10 +184,12 @@ class _AdminProductListScreenState
         ],
       ),
       bottomNavigationBar: const AdminBottomNavigation(index: 4),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/admin/products/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Thêm'),
+      floatingActionButton: AppPressScale(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push('/admin/products/new'),
+          icon: const Icon(Icons.add),
+          label: const Text('Thêm'),
+        ),
       ),
     );
   }

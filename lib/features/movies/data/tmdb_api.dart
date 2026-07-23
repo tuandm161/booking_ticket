@@ -41,7 +41,7 @@ class TmdbApi {
           )
           .toList();
     } on DioException catch (error) {
-      throw AppException.network(error);
+      throw _mapDioError(error);
     }
   }
 
@@ -63,8 +63,27 @@ class TmdbApi {
         Map<String, Object?>.from(response.data as Map),
       );
     } on DioException catch (error) {
-      throw AppException.network(error);
+      throw _mapDioError(error);
     }
+  }
+
+  AppException _mapDioError(DioException error) {
+    final status = error.response?.statusCode;
+    if (status == 401 || status == 403) {
+      return AppException(
+        code: 'tmdb_auth',
+        message: 'TMDB token không hợp lệ hoặc đã hết quyền truy cập.',
+        cause: error,
+      );
+    }
+    if (status != null) {
+      return AppException(
+        code: 'tmdb_http_$status',
+        message: 'TMDB trả về lỗi HTTP $status.',
+        cause: error,
+      );
+    }
+    return AppException.network(error);
   }
 }
 

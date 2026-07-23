@@ -6,6 +6,19 @@ import '../../../../shared/widgets/admin_bottom_navigation.dart';
 import '../../../../core/services/seed_provider.dart';
 import '../../providers/combo_providers.dart';
 
+import '../../../../shared/widgets/admin_filter_sort_header.dart';
+import '../../../../shared/widgets/app_press_scale.dart';
+
+enum AdminComboSortField { name, price, createdAt }
+
+extension AdminComboSortFieldX on AdminComboSortField {
+  String get label => switch (this) {
+        AdminComboSortField.name => 'Tên combo (A-Z)',
+        AdminComboSortField.price => 'Giá tiền',
+        AdminComboSortField.createdAt => 'Ngày tạo',
+      };
+}
+
 class AdminComboListScreen extends ConsumerStatefulWidget {
   const AdminComboListScreen({super.key});
   @override
@@ -15,7 +28,8 @@ class AdminComboListScreen extends ConsumerStatefulWidget {
 
 class _AdminComboListScreenState extends ConsumerState<AdminComboListScreen> {
   String _query = '';
-  bool _onlyAvailable = false;
+  AdminActiveStatusFilter _activeStatus = AdminActiveStatusFilter.all;
+  AdminComboSortField _sortField = AdminComboSortField.name;
 
   @override
   Widget build(BuildContext context) {
@@ -44,30 +58,46 @@ class _AdminComboListScreenState extends ConsumerState<AdminComboListScreen> {
                   setState(() => _query = value.trim().toLowerCase()),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: FilterChip(
-                label: const Text('Chỉ combo đang bán'),
-                selected: _onlyAvailable,
-                onSelected: (value) => setState(() => _onlyAvailable = value),
-              ),
-            ),
+          AdminFilterSortHeader<AdminComboSortField>(
+            activeStatus: _activeStatus,
+            onActiveStatusChanged: (val) => setState(() => _activeStatus = val),
+            activeLabel: 'Đang bán',
+            hiddenLabel: 'Tạm ẩn',
+            sortValue: _sortField,
+            sortItems: AdminComboSortField.values
+                .map((sf) => DropdownMenuItem(value: sf, child: Text(sf.label)))
+                .toList(),
+            onSortChanged: (val) {
+              if (val != null) setState(() => _sortField = val);
+            },
           ),
           Expanded(
             child: AppAsyncValueWidget(
               value: data,
               onRetry: () => ref.invalidate(combosProvider),
               data: (items) {
-                final filtered = items
-                    .where(
-                      (c) =>
-                          (_query.isEmpty ||
-                              c.name.toLowerCase().contains(_query)) &&
-                          (!_onlyAvailable || c.isAvailable),
-                    )
-                    .toList();
+                final filtered = items.where((c) {
+                  final matchesQuery = _query.isEmpty ||
+                      c.name.toLowerCase().contains(_query);
+                  final matchesActive = switch (_activeStatus) {
+                    AdminActiveStatusFilter.all => true,
+                    AdminActiveStatusFilter.active => c.isAvailable,
+                    AdminActiveStatusFilter.hidden => !c.isAvailable,
+                  };
+                  return matchesQuery && matchesActive;
+                }).toList();
+
+                filtered.sort((a, b) {
+                  return switch (_sortField) {
+                    AdminComboSortField.name =>
+                      a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                    AdminComboSortField.price => b.price.compareTo(a.price),
+                    AdminComboSortField.createdAt =>
+                      (b.createdAt ?? DateTime(0))
+                          .compareTo(a.createdAt ?? DateTime(0)),
+                  };
+                });
+
                 if (filtered.isEmpty) {
                   return const Center(child: Text('Không có combo phù hợp.'));
                 }
@@ -113,10 +143,12 @@ class _AdminComboListScreenState extends ConsumerState<AdminComboListScreen> {
         ],
       ),
       bottomNavigationBar: const AdminBottomNavigation(index: 4),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/admin/combos/new'),
-        icon: const Icon(Icons.add),
-        label: const Text('Thêm'),
+      floatingActionButton: AppPressScale(
+        child: FloatingActionButton.extended(
+          onPressed: () => context.push('/admin/combos/new'),
+          icon: const Icon(Icons.add),
+          label: const Text('Thêm'),
+        ),
       ),
     );
   }

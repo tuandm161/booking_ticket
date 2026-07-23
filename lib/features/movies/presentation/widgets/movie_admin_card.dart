@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../models/movie.dart';
+import 'movie_status_chip.dart';
 
 class MovieAdminCard extends StatelessWidget {
   const MovieAdminCard({
@@ -26,8 +27,19 @@ class MovieAdminCard extends StatelessWidget {
         ),
       ),
       title: Text(movie.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      subtitle: Text(
-        '${movie.status.label} • ${movie.bookingCount} lượt đặt${movie.isFeatured ? ' • Nổi bật' : ''}',
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 4),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 6,
+          runSpacing: 4,
+          children: [
+            MovieStatusChip(status: movie.status),
+            Text(
+              '${movie.bookingCount} lượt đặt${movie.isFeatured ? ' • Nổi bật' : ''}${movie.createdAt != null ? ' • Thêm: ${movie.createdAt!.day}/${movie.createdAt!.month}/${movie.createdAt!.year}' : ''}',
+            ),
+          ],
+        ),
       ),
       trailing: PopupMenuButton<String>(
         onSelected: (value) => switch (value) {

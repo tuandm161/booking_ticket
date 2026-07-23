@@ -1,5 +1,6 @@
 class FirestorePaths {
   static const users = 'users';
+  static const cinemas = 'cinemas';
   static const movies = 'movies';
   static const rooms = 'rooms';
   static const showtimes = 'showtimes';

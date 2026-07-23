@@ -1,6 +1,9 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../cinemas/models/cinema.dart';
+import '../../../cinemas/providers/cinema_providers.dart';
 import '../../data/room_repository.dart';
 import '../../models/cinema_room.dart';
 import '../../providers/room_providers.dart';
@@ -22,10 +25,13 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
   final _seats = TextEditingController(text: '10');
   final _vip = TextEditingController(text: '0');
   final _couple = TextEditingController(text: '0');
+  String? _cinemaId;
+  String? _cinemaName;
   RoomType _type = RoomType.standard;
   bool _active = true;
   bool _loading = true;
   bool _saving = false;
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +48,8 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
           .getRoom(widget.roomId!);
       if (room != null && mounted) {
         _name.text = room.name;
+        _cinemaId = room.cinemaId;
+        _cinemaName = room.cinemaName;
         _rows.text = '${room.rowCount}';
         _seats.text = '${room.seatsPerRow}';
         _vip.text = '${room.vipRowStart}';
@@ -64,14 +72,17 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
   }
 
   RoomDraft _draft() => RoomDraft(
-    name: _name.text,
-    roomType: _type,
-    rowCount: int.tryParse(_rows.text) ?? 0,
-    seatsPerRow: int.tryParse(_seats.text) ?? 0,
-    vipRowStart: int.tryParse(_vip.text) ?? 0,
-    coupleSeatCount: int.tryParse(_couple.text) ?? 0,
-    isActive: _active,
-  );
+        cinemaId: _cinemaId ?? '',
+        cinemaName: _cinemaName ?? '',
+        name: _name.text,
+        roomType: _type,
+        rowCount: int.tryParse(_rows.text) ?? 0,
+        seatsPerRow: int.tryParse(_seats.text) ?? 0,
+        vipRowStart: int.tryParse(_vip.text) ?? 0,
+        coupleSeatCount: int.tryParse(_couple.text) ?? 0,
+        isActive: _active,
+      );
+
   Future<void> _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final draft = _draft();
@@ -106,11 +117,18 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
   Widget build(BuildContext context) {
     if (_loading)
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    final cinemasState = ref.watch(cinemasProvider);
+    final cinemas = cinemasState.maybeWhen(
+      data: (items) => items,
+      orElse: () => <Cinema>[],
+    );
+
     final draft = _draft();
     List preview = [];
     try {
       preview = draft.previewSeats;
     } catch (_) {}
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -128,6 +146,16 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
           children: [
             RoomFormFields(
               nameController: _name,
+              selectedCinemaId: _cinemaId,
+              cinemas: cinemas,
+              onCinemaChanged: (c) {
+                if (c != null) {
+                  setState(() {
+                    _cinemaId = c.id;
+                    _cinemaName = c.name;
+                  });
+                }
+              },
               roomType: _type,
               onRoomTypeChanged: (v) {
                 if (v != null) setState(() => _type = v);
@@ -144,8 +172,18 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: _saving ? null : _save,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(50),
+              ),
               child: _saving
-                  ? const CircularProgressIndicator()
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.white,
+                      ),
+                    )
                   : const Text('Lưu phòng'),
             ),
           ],
@@ -154,5 +192,3 @@ class _AdminRoomFormScreenState extends ConsumerState<AdminRoomFormScreen> {
     );
   }
 }
-
-// ignore_for_file: curly_braces_in_flow_control_structures

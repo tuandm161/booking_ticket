@@ -59,7 +59,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
             validator: emailValidator,
           ),
           const SizedBox(height: 16),
-          FilledButton(onPressed: _submit, child: const Text('Gửi hướng dẫn')),
+          FilledButton(
+            onPressed: _submit,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size.fromHeight(50),
+            ),
+            child: const Text('Gửi hướng dẫn'),
+          ),
           TextButton(
             onPressed: () => context.go('/login'),
             child: const Text('Quay lại đăng nhập'),

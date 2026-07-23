@@ -59,17 +59,11 @@ class _MovieBookingAppState extends ConsumerState<MovieBookingApp> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(firebaseAuthStateProvider);
-    final appUser = ref.watch(currentAppUserProvider);
-    _router = createAppRouter(
-      themeMode: _themeMode,
-      onThemeChanged: _setThemeMode,
-      firebaseUser: authState.value,
-      appUser: appUser.value,
-      authLoading: authState.isLoading,
-      profileLoading: appUser.isLoading,
-      authError: authState.hasError,
-      profileError: appUser.hasError,
+    _router = ref.watch(
+      routerProvider((
+        themeMode: _themeMode,
+        onThemeChanged: _setThemeMode,
+      )),
     );
     return MaterialApp.router(
       title: 'Movie Booking',

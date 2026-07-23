@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/admin_dashboard/presentation/screens/admin_dashboard_screen.dart';
@@ -7,6 +8,7 @@ import '../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
 import '../features/auth/presentation/screens/profile_missing_screen.dart';
 import '../features/auth/presentation/screens/register_screen.dart';
+import '../features/auth/providers/auth_providers.dart';
 import '../features/profile/presentation/screens/profile_screen.dart';
 import '../features/rooms/models/cinema_room.dart';
 import '../features/movies/presentation/screens/admin_movie_form_screen.dart';
@@ -19,6 +21,8 @@ import '../features/concessions/presentation/screens/admin_combo_list_screen.dar
 import '../features/concessions/presentation/screens/admin_combo_form_screen.dart';
 import '../features/vouchers/presentation/screens/admin_voucher_list_screen.dart';
 import '../features/vouchers/presentation/screens/admin_voucher_form_screen.dart';
+import '../features/cinemas/presentation/screens/admin_cinema_list_screen.dart';
+import '../features/cinemas/presentation/screens/admin_cinema_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_form_screen.dart';
 import '../features/rooms/presentation/screens/admin_room_list_screen.dart';
 import '../features/rooms/presentation/screens/room_detail_screen.dart';
@@ -42,40 +46,62 @@ import '../features/booking/presentation/screens/admin_booking_detail_screen.dar
 import '../features/admin_dashboard/presentation/screens/admin_management_menu_screen.dart';
 import '../shared/models/app_user.dart';
 
-GoRouter createAppRouter({
-  required ThemeMode themeMode,
-  required ValueChanged<ThemeMode> onThemeChanged,
-  User? firebaseUser,
-  AppUser? appUser,
-  bool authLoading = false,
-  bool profileLoading = false,
-  bool authError = false,
-  bool profileError = false,
-}) {
+class AppRouterNotifier extends ChangeNotifier {
+  AppRouterNotifier(this._ref) {
+    _ref.listen<AsyncValue<User?>>(firebaseAuthStateProvider, (previous, next) {
+      notifyListeners();
+    });
+    _ref.listen<AsyncValue<AppUser?>>(currentAppUserProvider, (previous, next) {
+      notifyListeners();
+    });
+  }
+
+  final Ref _ref;
+}
+
+final routerProvider = Provider.family<
+  GoRouter,
+  ({ThemeMode themeMode, ValueChanged<ThemeMode> onThemeChanged})
+>((ref, args) {
+  final notifier = AppRouterNotifier(ref);
+
   return GoRouter(
+    refreshListenable: notifier,
     initialLocation: '/login',
     redirect: (context, state) {
+      final authState = ref.read(firebaseAuthStateProvider);
+      final appUser = ref.read(currentAppUserProvider);
+
+      final authError = authState.hasError;
+      final authLoading = authState.isLoading;
+      final firebaseUser = authState.value;
+
+      final profileError = appUser.hasError;
+      final profileLoading = appUser.isLoading;
+      final user = appUser.value;
+
       final path = state.uri.path;
       final isAuthRoute =
           path == '/login' || path == '/register' || path == '/forgot-password';
+
       if (authError) {
         return isAuthRoute ? null : '/login';
       }
       if (authLoading) return path == '/splash' ? null : '/splash';
       if (firebaseUser == null) return isAuthRoute ? null : '/login';
       if (profileLoading) return path == '/splash' ? null : '/splash';
-      if (profileError || appUser == null) {
+      if (profileError || user == null) {
         return path == '/profile-missing' ? null : '/profile-missing';
       }
       if (isAuthRoute || path == '/splash' || path == '/profile-missing') {
-        return appUser.role == UserRole.admin
+        return user.role == UserRole.admin
             ? '/admin/dashboard'
             : '/user/home';
       }
-      if (appUser.role == UserRole.admin && path.startsWith('/user')) {
+      if (user.role == UserRole.admin && path.startsWith('/user')) {
         return '/admin/dashboard';
       }
-      if (appUser.role == UserRole.user && path.startsWith('/admin')) {
+      if (user.role == UserRole.user && path.startsWith('/admin')) {
         return '/user/home';
       }
       return null;
@@ -83,8 +109,10 @@ GoRouter createAppRouter({
     routes: [
       GoRoute(
         path: '/login',
-        builder: (context, state) =>
-            LoginScreen(themeMode: themeMode, onThemeChanged: onThemeChanged),
+        builder: (context, state) => LoginScreen(
+          themeMode: args.themeMode,
+          onThemeChanged: args.onThemeChanged,
+        ),
       ),
       GoRoute(
         path: '/register',
@@ -212,6 +240,20 @@ GoRouter createAppRouter({
         builder: (context, state) => const AdminManagementMenuScreen(),
       ),
       GoRoute(
+        path: '/admin/cinemas',
+        builder: (context, state) => const AdminCinemaListScreen(),
+      ),
+      GoRoute(
+        path: '/admin/cinemas/new',
+        builder: (context, state) => const AdminCinemaFormScreen(),
+      ),
+      GoRoute(
+        path: '/admin/cinemas/:cinemaId/edit',
+        builder: (context, state) => AdminCinemaFormScreen(
+          cinemaId: state.pathParameters['cinemaId'],
+        ),
+      ),
+      GoRoute(
         path: '/admin/rooms',
         builder: (context, state) => const AdminRoomListScreen(),
       ),
@@ -305,4 +347,4 @@ GoRouter createAppRouter({
       ),
     ],
   );
-}
+});
